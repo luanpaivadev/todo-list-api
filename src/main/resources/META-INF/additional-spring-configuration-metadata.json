@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "username.authentication",
+    "type": "java.lang.String",
+    "description": "A description for 'username.authentication'"
+  },
+  {
+    "name": "password.authentication",
+    "type": "java.lang.String",
+    "description": "A description for 'password.authentication'"
+  }
+]}
