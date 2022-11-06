@@ -22,5 +22,6 @@ public class Task {
     private String description;
     private Boolean completed;
     private String alarm;
+    private String userId;
 
 }

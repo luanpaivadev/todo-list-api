@@ -2,7 +2,7 @@ package com.luanpaiva.todolistapi.api.v1.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.luanpaiva.todolistapi.domain.exceptions.RestTemplateException;
-import com.luanpaiva.todolistapi.domain.service.LoginService;
+import com.luanpaiva.todolistapi.domain.service.KeycloakService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,23 +13,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/v1/login")
-public class LoginController {
+@RequestMapping("/v1/keycloak/validate/token")
+public class KeycloakController {
 
     @Autowired
-    private LoginService loginService;
+    private KeycloakService keycloakService;
 
     @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public ResponseEntity<?> login(@RequestParam("username") final String username, @RequestParam("password") final String password) {
+    public ResponseEntity<?> validateToken(@RequestParam("token") final String token) {
 
         try {
-            JsonNode accessToken = loginService.getAccessToken(username, password);
-            return accessToken != null
-                    ? ResponseEntity.ok(accessToken)
-                    : ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+            JsonNode response = keycloakService.validateToken(token);
+            final boolean active = response.get("active").asBoolean();
+            return ResponseEntity.ok(active);
         } catch (RestTemplateException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
     }
 }
