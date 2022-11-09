@@ -25,7 +25,7 @@ import com.luanpaiva.todolistapi.api.v1.assembler.TaskDisassembler;
 import com.luanpaiva.todolistapi.api.v1.model.dto.TaskDto;
 import com.luanpaiva.todolistapi.api.v1.model.input.TaskInput;
 import com.luanpaiva.todolistapi.domain.repository.TaskRepository;
-import com.luanpaiva.todolistapi.domain.service.TaskService;
+import com.luanpaiva.todolistapi.domain.service.TaskServiceImpl;
 
 @RestController
 @RequestMapping("/v1/tasks")
@@ -35,7 +35,7 @@ public class TaskController {
     private ModelMapper modelMapper;
 
     @Autowired
-    private TaskService taskService;
+    private TaskServiceImpl taskService;
 
     @Autowired
     private TaskRepository taskRepository;

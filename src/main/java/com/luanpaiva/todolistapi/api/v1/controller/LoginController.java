@@ -16,20 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/login")
 public class LoginController {
 
-    @Autowired
-    private LoginService loginService;
-
-    @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public ResponseEntity<?> login(@RequestParam("username") final String username, @RequestParam("password") final String password) {
-
-        try {
-            JsonNode accessToken = loginService.getAccessToken(username, password);
-            return accessToken != null
-                    ? ResponseEntity.ok(accessToken)
-                    : ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
-        } catch (RestTemplateException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-
-    }
+//    @Autowired
+//    private LoginService loginService;
+//
+//    @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+//    public ResponseEntity<?> login(@RequestParam("username") final String username, @RequestParam("password") final String password) {
+//
+//        try {
+//            JsonNode accessToken = loginService.getAccessToken(username, password);
+//            return accessToken != null
+//                    ? ResponseEntity.ok(accessToken)
+//                    : ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+//        } catch (RestTemplateException e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+//        }
+//
+//    }
 }
