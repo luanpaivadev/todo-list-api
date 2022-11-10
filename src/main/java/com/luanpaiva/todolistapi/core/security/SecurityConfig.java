@@ -26,15 +26,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(
+                authenticationManagerBean());
         customAuthenticationFilter.setFilterProcessesUrl("/v1/login");
-        http.csrf().disable();
-        http.cors().disable();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().antMatchers("/v1/login/**").permitAll();
-        http.authorizeRequests().anyRequest().authenticated();
-        http.addFilter(customAuthenticationFilter);
-        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.csrf().disable().cors()
+                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().authorizeRequests().antMatchers("/v1/login/**").permitAll()
+                .and().authorizeRequests().anyRequest().authenticated()
+                .and().addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilter(customAuthenticationFilter);
     }
 
     @Override
