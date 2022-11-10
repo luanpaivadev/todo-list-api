@@ -51,9 +51,10 @@ public class TaskController {
 
     private static final String HAS_ROLE_USER = "hasRole('ROLE_USER')";
     private static final String HAS_ROLE_ADMIN = "hasRole('ROLE_ADMIN')";
-
+    private static final String HAS_ANY_ROLE_USER_AND_ADMIN = "hasAnyRole('ROLE_USER', 'ROLE_ADMIN')";
+    
     @GetMapping
-    @PreAuthorize(HAS_ROLE_USER)
+    @PreAuthorize(HAS_ANY_ROLE_USER_AND_ADMIN)
     public ResponseEntity<List<TaskDto>> findAllOrderById() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -70,7 +71,7 @@ public class TaskController {
     }
 
     @PostMapping
-    @PreAuthorize(HAS_ROLE_ADMIN)
+    @PreAuthorize(HAS_ANY_ROLE_USER_AND_ADMIN)
     public ResponseEntity<TaskDto> save(@RequestBody final TaskInput taskInput) {
 
         try {
@@ -90,7 +91,7 @@ public class TaskController {
     }
 
     @PutMapping("/{taskId}")
-    @PreAuthorize(HAS_ROLE_ADMIN)
+    @PreAuthorize(HAS_ANY_ROLE_USER_AND_ADMIN)
     public ResponseEntity<TaskDto> update(@RequestBody final TaskInput taskInput, @PathVariable final Long taskId) {
 
         try {
@@ -113,7 +114,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/{taskId}")
-    @PreAuthorize(HAS_ROLE_ADMIN)
+    @PreAuthorize(HAS_ANY_ROLE_USER_AND_ADMIN)
     public ResponseEntity<?> delete(@PathVariable final Long taskId) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
