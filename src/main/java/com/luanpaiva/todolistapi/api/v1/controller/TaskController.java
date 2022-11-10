@@ -4,10 +4,12 @@ import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
 
+import com.luanpaiva.todolistapi.domain.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,17 +48,19 @@ public class TaskController {
     @Autowired
     private TaskDisassembler taskDisassembler;
 
-    @RolesAllowed({ "user", "admin" })
+    @Autowired
+    private UserRepository userRepository;
+
+    @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping
     public ResponseEntity<List<TaskDto>> findAllOrderById() {
-        
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
-            final var userId = authentication.getName();
-            final var taskList = taskRepository.findAllOrderById(userId);
+            final var username = authentication.getName();
+            final var taskList = taskRepository.findByUsername(username);
             final var taskDtoList = taskAssembler.toListDtoObject(taskList);
             return ResponseEntity.ok(taskDtoList);
         } catch (Exception e) {
@@ -74,8 +78,9 @@ public class TaskController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
             final var task = taskDisassembler.toDomainObject(taskInput);
-            final var userId = authentication.getName();
-            task.setUserId(userId);
+            final var username = authentication.getName();
+            final var user = userRepository.findByUsername(username);
+            task.setUser(user);
             final var taskDto = taskAssembler.toDtoObject(taskService.saveTask(task));
             return ResponseEntity.status(HttpStatus.CREATED).body(taskDto);
         } catch (Exception e) {
@@ -92,8 +97,8 @@ public class TaskController {
             if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
-            final var userId = authentication.getName();
-            final var response = taskRepository.findByUserIdAndTaskId(userId, taskId);
+            final var username = authentication.getName();
+            final var response = taskRepository.findByIdAndUserUsername(taskId, username);
             if (response.isPresent()) {
                 var task = response.get();
                 modelMapper.map(taskInput, task);
@@ -114,8 +119,8 @@ public class TaskController {
             if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
-            final var userId = authentication.getName();
-            final var response = taskRepository.findByUserIdAndTaskId(userId, taskId);
+            final var username = authentication.getName();
+            final var response = taskRepository.findByIdAndUserUsername(taskId, username);
             return response.map(task -> {
                 taskService.deleteTask(task);
                 return ResponseEntity.noContent().build();
