@@ -1,7 +1,7 @@
 package com.luanpaiva.todolistapi.domain.service;
 
-import com.luanpaiva.todolistapi.domain.model.Role;
-import com.luanpaiva.todolistapi.domain.model.AppUser;
+import com.luanpaiva.todolistapi.domain.model.Authority;
+import com.luanpaiva.todolistapi.domain.model.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,10 +9,10 @@ import java.util.List;
 @Service
 public interface UserService {
 
-    AppUser saveUser(final AppUser user);
-    Role saveRole(final Role role);
-    void addRoleToUser(final String username, final String roleName);
-    AppUser getUser(final String username);
-    List<AppUser> getUsers();
+    User saveUser(final User user);
+    Authority saveAuthority(final Authority authority);
+    void addAuthorityToUser(final String username, final String roleName);
+    User getUser(final String username);
+    List<User> getUsers();
 
 }

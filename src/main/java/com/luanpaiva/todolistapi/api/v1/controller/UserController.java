@@ -1,7 +1,7 @@
 package com.luanpaiva.todolistapi.api.v1.controller;
 
-import com.luanpaiva.todolistapi.domain.model.Role;
-import com.luanpaiva.todolistapi.domain.model.AppUser;
+import com.luanpaiva.todolistapi.domain.model.Authority;
+import com.luanpaiva.todolistapi.domain.model.User;
 import com.luanpaiva.todolistapi.domain.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,17 +26,17 @@ public class UserController {
 
 
     @GetMapping("/users")
-    public ResponseEntity<List<AppUser>> findAllUsers() {
+    public ResponseEntity<List<User>> findAllUsers() {
         return ok(userService.getUsers());
     }
 
     @PostMapping("/users/save")
-    public ResponseEntity<AppUser> saveUser(@RequestBody final AppUser user) {
+    public ResponseEntity<User> saveUser(@RequestBody final User user) {
         return status(CREATED).body(userService.saveUser(user));
     }
 
     @PostMapping("/roles/save")
-    public ResponseEntity<Role> saveRole(@RequestBody final Role role) {
-        return status(CREATED).body(userService.saveRole(role));
+    public ResponseEntity<Authority> saveRole(@RequestBody final Authority authority) {
+        return status(CREATED).body(userService.saveAuthority(authority));
     }
 }

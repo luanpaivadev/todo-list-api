@@ -11,15 +11,17 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.Collection;
 
 @Data
 @Entity
+@Table(name = "tbl_user")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class AppUser {
+public class User {
 
     @Id
     @EqualsAndHashCode.Include
@@ -29,6 +31,6 @@ public class AppUser {
     private String password;
     private Boolean enabled;
     @ManyToMany(fetch = FetchType.EAGER)
-    private Collection<Role> roles = new ArrayList<>();
+    private Collection<Authority> authorities = new ArrayList<>();
 
 }

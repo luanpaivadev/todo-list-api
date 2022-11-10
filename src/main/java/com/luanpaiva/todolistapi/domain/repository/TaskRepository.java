@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
-    @Query("SELECT t FROM Task t JOIN FETCH t.user u JOIN FETCH u.roles WHERE u.username = :username ORDER BY t.id ASC")
+    @Query("SELECT t FROM Task t JOIN FETCH t.user u WHERE u.username = :username ORDER BY t.id ASC")
     List<Task> findByUsername(final String username);
 
     Optional<Task> findByIdAndUserUsername(final Long id, final String username);

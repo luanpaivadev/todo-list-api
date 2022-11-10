@@ -1,10 +1,12 @@
 package com.luanpaiva.todolistapi.api.v1.controller;
 
-import java.util.List;
-
-import javax.annotation.security.RolesAllowed;
-
+import com.luanpaiva.todolistapi.api.v1.assembler.TaskAssembler;
+import com.luanpaiva.todolistapi.api.v1.assembler.TaskDisassembler;
+import com.luanpaiva.todolistapi.api.v1.model.dto.TaskDto;
+import com.luanpaiva.todolistapi.api.v1.model.input.TaskInput;
+import com.luanpaiva.todolistapi.domain.repository.TaskRepository;
 import com.luanpaiva.todolistapi.domain.repository.UserRepository;
+import com.luanpaiva.todolistapi.domain.service.TaskServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,12 +24,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.luanpaiva.todolistapi.api.v1.assembler.TaskAssembler;
-import com.luanpaiva.todolistapi.api.v1.assembler.TaskDisassembler;
-import com.luanpaiva.todolistapi.api.v1.model.dto.TaskDto;
-import com.luanpaiva.todolistapi.api.v1.model.input.TaskInput;
-import com.luanpaiva.todolistapi.domain.repository.TaskRepository;
-import com.luanpaiva.todolistapi.domain.service.TaskServiceImpl;
+import javax.annotation.security.RolesAllowed;
+import java.util.List;
 
 @RestController
 @RequestMapping("/v1/tasks")
@@ -51,8 +49,11 @@ public class TaskController {
     @Autowired
     private UserRepository userRepository;
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    private static final String HAS_ROLE_USER = "hasRole('ROLE_USER')";
+    private static final String HAS_ROLE_ADMIN = "hasRole('ROLE_ADMIN')";
+
     @GetMapping
+    @PreAuthorize(HAS_ROLE_USER)
     public ResponseEntity<List<TaskDto>> findAllOrderById() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -68,8 +69,8 @@ public class TaskController {
         }
     }
 
-    @RolesAllowed("admin")
     @PostMapping
+    @PreAuthorize(HAS_ROLE_ADMIN)
     public ResponseEntity<TaskDto> save(@RequestBody final TaskInput taskInput) {
 
         try {
@@ -88,8 +89,8 @@ public class TaskController {
         }
     }
 
-    @RolesAllowed("admin")
     @PutMapping("/{taskId}")
+    @PreAuthorize(HAS_ROLE_ADMIN)
     public ResponseEntity<TaskDto> update(@RequestBody final TaskInput taskInput, @PathVariable final Long taskId) {
 
         try {
@@ -111,8 +112,8 @@ public class TaskController {
         }
     }
 
-    @RolesAllowed("admin")
     @DeleteMapping("/{taskId}")
+    @PreAuthorize(HAS_ROLE_ADMIN)
     public ResponseEntity<?> delete(@PathVariable final Long taskId) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
