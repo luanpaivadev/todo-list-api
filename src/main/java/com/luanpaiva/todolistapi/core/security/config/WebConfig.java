@@ -1,4 +1,4 @@
-package com.luanpaiva.todolistapi.core;
+package com.luanpaiva.todolistapi.core.security.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

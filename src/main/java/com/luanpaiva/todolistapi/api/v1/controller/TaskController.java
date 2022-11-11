@@ -1,9 +1,10 @@
 package com.luanpaiva.todolistapi.api.v1.controller;
 
+import static com.luanpaiva.todolistapi.utils.Roles.HAS_ANY_ROLE;
+
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,39 +24,28 @@ import com.luanpaiva.todolistapi.api.v1.assembler.TaskAssembler;
 import com.luanpaiva.todolistapi.api.v1.assembler.TaskDisassembler;
 import com.luanpaiva.todolistapi.api.v1.model.dto.TaskDto;
 import com.luanpaiva.todolistapi.api.v1.model.input.TaskInput;
+import com.luanpaiva.todolistapi.domain.exceptions.UserNotFoundException;
 import com.luanpaiva.todolistapi.domain.repository.TaskRepository;
 import com.luanpaiva.todolistapi.domain.repository.UserRepository;
 import com.luanpaiva.todolistapi.domain.service.TaskServiceImpl;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/v1/tasks")
 public class TaskController {
 
-    @Autowired
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
+    private final TaskServiceImpl taskService;
+    private final TaskRepository taskRepository;
+    private final TaskAssembler taskAssembler;
+    private final TaskDisassembler taskDisassembler;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private TaskServiceImpl taskService;
-
-    @Autowired
-    private TaskRepository taskRepository;
-
-    @Autowired
-    private TaskAssembler taskAssembler;
-
-    @Autowired
-    private TaskDisassembler taskDisassembler;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    private static final String HAS_ROLE_USER = "hasRole('ROLE_USER')";
-    private static final String HAS_ROLE_ADMIN = "hasRole('ROLE_ADMIN')";
-    private static final String HAS_ANY_ROLE_USER_AND_ADMIN = "hasAnyRole('ROLE_USER', 'ROLE_ADMIN')";
-    
     @GetMapping
-    @PreAuthorize(HAS_ANY_ROLE_USER_AND_ADMIN)
-    public ResponseEntity<List<TaskDto>> findAllOrderById() {
+    @PreAuthorize(HAS_ANY_ROLE)
+    public ResponseEntity<List<TaskDto>> findAll() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
@@ -71,19 +61,17 @@ public class TaskController {
     }
 
     @PostMapping
-    @PreAuthorize(HAS_ANY_ROLE_USER_AND_ADMIN)
+    @PreAuthorize(HAS_ANY_ROLE)
     public ResponseEntity<TaskDto> save(@RequestBody final TaskInput taskInput) {
 
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-            final var task = taskDisassembler.toDomainObject(taskInput);
             final var username = authentication.getName();
-            final var user = userRepository.findByUsername(username);
+            final var task = taskDisassembler.toDomainObject(taskInput);
+            final var user = userRepository.findByUsername(username)
+                    .orElseThrow(UserNotFoundException::new);
             task.setUser(user);
-            final var taskDto = taskAssembler.toDtoObject(taskService.saveTask(task));
+            final var taskDto = taskAssembler.toDtoObject(taskService.save(task));
             return ResponseEntity.status(HttpStatus.CREATED).body(taskDto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -91,20 +79,17 @@ public class TaskController {
     }
 
     @PutMapping("/{taskId}")
-    @PreAuthorize(HAS_ANY_ROLE_USER_AND_ADMIN)
+    @PreAuthorize(HAS_ANY_ROLE)
     public ResponseEntity<TaskDto> update(@RequestBody final TaskInput taskInput, @PathVariable final Long taskId) {
 
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
             final var username = authentication.getName();
-            final var response = taskRepository.findByIdAndUserUsername(taskId, username);
-            if (response.isPresent()) {
-                var task = response.get();
+            final var taskOptional = taskRepository.findByIdAndUserUsername(taskId, username);
+            if (taskOptional.isPresent()) {
+                final var task = taskOptional.get();
                 modelMapper.map(taskInput, task);
-                final var taskDto = taskAssembler.toDtoObject(taskService.saveTask(task));
+                final var taskDto = taskAssembler.toDtoObject(taskService.save(task));
                 return ResponseEntity.status(HttpStatus.OK).body(taskDto);
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -114,19 +99,17 @@ public class TaskController {
     }
 
     @DeleteMapping("/{taskId}")
-    @PreAuthorize(HAS_ANY_ROLE_USER_AND_ADMIN)
+    @PreAuthorize(HAS_ANY_ROLE)
     public ResponseEntity<?> delete(@PathVariable final Long taskId) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
             final var username = authentication.getName();
-            final var response = taskRepository.findByIdAndUserUsername(taskId, username);
-            return response.map(task -> {
-                taskService.deleteTask(task);
+            final var taskOptional = taskRepository.findByIdAndUserUsername(taskId, username);
+            if (taskOptional.isPresent()) {
+                taskService.delete(taskOptional.get());
                 return ResponseEntity.noContent().build();
-            }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }

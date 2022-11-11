@@ -2,6 +2,7 @@ package com.luanpaiva.todolistapi.core.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -29,10 +30,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(
                 authenticationManagerBean());
         customAuthenticationFilter.setFilterProcessesUrl("/v1/login");
-        http.csrf().disable().cors()
-                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().authorizeRequests().antMatchers("/v1/login/**").permitAll()
+        http.cors()
+                .and().csrf().disable()
+                .authorizeRequests().antMatchers("/v1/login/**").permitAll()
+                .and().authorizeRequests().antMatchers(HttpMethod.POST, "/v1/users").permitAll()
                 .and().authorizeRequests().anyRequest().authenticated()
+                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilter(customAuthenticationFilter);
     }

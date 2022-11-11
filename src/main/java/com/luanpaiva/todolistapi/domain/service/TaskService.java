@@ -4,7 +4,7 @@ import com.luanpaiva.todolistapi.domain.model.Task;
 
 public interface TaskService {
 
-    Task saveTask(final Task task);
-    void deleteTask(final Task task);
+    Task save(final Task task);
+    void delete(final Task task);
 
 }

@@ -1,4 +1,4 @@
-package com.luanpaiva.todolistapi.core;
+package com.luanpaiva.todolistapi.core.security.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

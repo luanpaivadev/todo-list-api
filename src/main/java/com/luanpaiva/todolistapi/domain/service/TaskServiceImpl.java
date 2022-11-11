@@ -14,13 +14,13 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public Task saveTask(Task task) {
+    public Task save(Task task) {
         return taskRepository.save(task);
     }
 
     @Override
     @Transactional
-    public void deleteTask(Task task) {
+    public void delete(Task task) {
         taskRepository.delete(task);
     }
     
