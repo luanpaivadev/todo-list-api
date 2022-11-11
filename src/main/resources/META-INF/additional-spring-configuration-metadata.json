@@ -1,12 +1,12 @@
 {"properties": [
   {
-    "name": "username.authentication",
+    "name": "jwt.expire",
     "type": "java.lang.String",
-    "description": "A description for 'username.authentication'"
+    "description": "A description for 'jwt.expire'"
   },
   {
-    "name": "password.authentication",
+    "name": "jwt.secret",
     "type": "java.lang.String",
-    "description": "A description for 'password.authentication'"
+    "description": "A description for 'jwt.secret'"
   }
 ]}
