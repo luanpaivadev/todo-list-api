@@ -1,0 +1,42 @@
+version: '3.9'
+
+networks:
+  todolist-network:
+    driver: bridge
+
+services:
+  todolist-db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 0190747e-0f0f-41b9-ada0-d2632b474a1f
+      POSTGRES_DB: todolist-db-dev
+    ports:
+      - "5432:5432"
+    networks:
+      - todolist-network
+
+  todolist-api:
+      image: todolist-api
+      command: [
+        "/wait-for-it.sh",
+        "-t",
+        "15",
+        "todolist-db:5432",
+        "--",
+        "java",
+        "-jar",
+        "api.jar"]
+      environment:
+        DB_HOST: todolist-db
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: 0190747e-0f0f-41b9-ada0-d2632b474a1f
+        POSTGRES_DB: todolist-db-dev
+        PROFILE: dev
+        SERVER_PORT: 8080
+      ports:
+        - "8081:8080"
+      networks:
+        - todolist-network
+      depends_on:
+        - todolist-db
